@@ -10,51 +10,24 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v3
-
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          distribution: temurin
-          java-version: '17'
+        uses: actions/checkout@v4
 
       - name: Setup Flutter
         uses: subosito/flutter-action@v2
         with:
           flutter-version: '3.22.0'
 
-      - name: Ensure Android project files
-        run: flutter create --platforms=android .
-
-      - name: Enforce Android SDK versions
-        run: |
-          sed -i 's/minSdk = flutter.minSdkVersion/minSdk = 21/' android/app/build.gradle
-          sed -i 's/targetSdk = flutter.targetSdkVersion/targetSdk = 34/' android/app/build.gradle
-          sed -i 's/compileSdk = flutter.compileSdkVersion/compileSdk = 34/' android/app/build.gradle
-
-
-      - name: Enforce Gradle properties
-        run: |
-          cat > android/gradle.properties <<'PROPS'
-          org.gradle.jvmargs=-Xmx2048M
-          android.useAndroidX=true
-          android.enableJetifier=true
-          PROPS
-
-      - name: Clean
+      - name: Clean project
         run: flutter clean
 
-      - name: Install dependencies
+      - name: Get dependencies
         run: flutter pub get
-
-      - name: Generate launcher icons
-        run: flutter pub run flutter_launcher_icons
 
       - name: Build APK
         run: flutter build apk --release
 
       - name: Upload APK
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: fday-apk
           path: build/app/outputs/flutter-apk/app-release.apk
